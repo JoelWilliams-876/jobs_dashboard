@@ -206,13 +206,13 @@ if not df.empty:
         html.H1("BLS Employment Data"),
 
         # Dropdown for selecting data type
-        html.Label("Select Data Type:"),
+        html.Label("Select Data Slice:"),
         dcc.Dropdown(
             id="data-type",
             options=[
-                {"label": "Civilan Labor Force", "value": "actual"},
-                {"label": "Percentage Change (MoM)", "value": "MoM"},
-                {"label": "Percentage Change (YoY)", "value": "YoY"}
+                {"label": "Actual Employment", "value": "actual"},
+                {"label": "Percentage Change (Month over Month)", "value": "MoM"},
+                {"label": "Percentage Change (Year over Year)", "value": "YoY"}
             ],
             value="actual",
         ),
