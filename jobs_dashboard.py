@@ -119,5 +119,5 @@ if not df.empty:
     if __name__ == "__main__":
         app.run_server(debug=True)
 
-else:
-    print("No data available for the graph.")
+    else:
+        print("No data available for the graph.")
