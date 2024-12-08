@@ -210,29 +210,29 @@ if not df.empty:
         dcc.Dropdown(
             id="data-type",
             options=[
-                {"label": "Actual Unemployment Rate", "value": "actual"},
+                {"label": "Civilan Labor Force", "value": "actual"},
                 {"label": "Percentage Change (MoM)", "value": "MoM"},
                 {"label": "Percentage Change (YoY)", "value": "YoY"}
             ],
             value="actual",
         ),
 
-        dcc.Graph(id="unemployment-graph"),
+        dcc.Graph(id="participation-graph"),
     ])
 
     # Callback to update the graph
     @app.callback(
-        Output("unemployment-graph", "figure"),
+        Output("participation-graph", "figure"),
         Input("data-type", "value"),
     )
     def update_graph(data_type):
         df_copy = df.copy()
 
         if data_type == "actual":
-            fig = px.line(df_copy, x="date", y="actual", title="Actual Unemployment Rate",
-                          labels={"date": "Date", "actual": "Unemployment Rate (%)"},
+            fig = px.line(df_copy, x="date", y="actual", title="Civilan Labor Force",
+                          labels={"date": "Date", "actual": "Actual Employment"},
                           template="plotly_dark")
-            fig.update_layout(yaxis=dict(title="Unemployment Rate (%)"))
+            fig.update_layout(yaxis=dict(title="Actual Employment"))
         else:
             df_copy, title = calculate_percentage_change(df_copy, data_type)
             fig = px.line(df_copy, x="date", y="change", title=title,
