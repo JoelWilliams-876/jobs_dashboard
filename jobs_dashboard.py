@@ -9,7 +9,7 @@ Original file is located at
 
 import requests
 import pandas as pd
-from plotly import express as px
+import plotly.express as px
 from bs4 import BeautifulSoup
 import dash
 from dash import dcc, html, Input, Output
