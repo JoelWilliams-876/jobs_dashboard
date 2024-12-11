@@ -7,8 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1LdV9L1m1oIvEWPT5rWEnlmQZRvAj_Ugr
 """
 
-# with scheduler
-!pip install apscheduler
+!pip install streamlit
 import requests
 import pandas as pd
 import plotly.express as px
@@ -18,7 +17,7 @@ from apscheduler.schedulers.background import BackgroundScheduler as bs
 from datetime import datetime
 import holidays
 
-# function to fetch and parse the data from BLS table and converting data to a dataframe.
+# Function to fetch and parse the data from BLS table and convert it to a dataframe.
 def fetch_bls_table_data():
     url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
     response = requests.get(url)
@@ -96,9 +95,11 @@ if 'df' not in st.session_state:
     st.session_state.df = pd.DataFrame()
 
 # Start APScheduler in the background to fetch data on the first business day of each month
-scheduler = bs()
-scheduler.add_job(fetch_and_update_data, 'cron', day='1-7', hour=9, minute=0)  # Check daily at midnight
-scheduler.start()
+if 'scheduler' not in st.session_state:
+    scheduler = bs()
+    scheduler.add_job(fetch_and_update_data, 'cron', day='1-7', hour=9, minute=0)  # Check daily at 9 AM
+    scheduler.start()
+    st.session_state.scheduler = scheduler  # Store the scheduler in session state
 
 # Check if the data is loaded
 if not st.session_state.df.empty:
