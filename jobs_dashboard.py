@@ -13,7 +13,7 @@ import pandas as pd
 import plotly.express as px
 from bs4 import BeautifulSoup
 import streamlit as st
-from apscheduler.schedulers.background import BackgroundScheduler as bs
+from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import holidays
 
@@ -95,8 +95,8 @@ if 'df' not in st.session_state:
     st.session_state.df = pd.DataFrame()
 
 # Start APScheduler in the background to fetch data on the first business day of each month
-scheduler = bs()
-scheduler.add_job(fetch_and_update_data, 'cron', day='1-7', hour=0, minute=0)  # Check daily at midnight
+scheduler = BackgroundScheduler()
+scheduler.add_job(fetch_and_update_data, 'cron', day='1-7', hour=9, minute=0)  # Check daily at midnight
 scheduler.start()
 
 # Check if the data is loaded
