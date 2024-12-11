@@ -9,9 +9,6 @@ Original file is located at
 
 !pip install streamlit
 !pip install apscheduler
-!pip install dash
-import dash
-from dash import dcc, html, Input, Output
 import requests
 import pandas as pd
 import plotly.express as px
@@ -124,7 +121,6 @@ if not st.session_state.df.empty:
         fig = px.line(df, x="date", y="change", title=title,
                       labels={"date": "Date", "change": "% Change"},
                       template="plotly_dark")
-
     st.plotly_chart(fig)
 else:
     st.error("No data available for the graph.")
