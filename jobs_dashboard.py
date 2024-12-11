@@ -10,7 +10,7 @@ Original file is located at
 !pip install streamlit
 !pip apscheduler
 !pip dash
-import dash
+from dash import dcc, html, Input, Output
 import requests
 import pandas as pd
 import plotly.express as px
