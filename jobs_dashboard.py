@@ -18,7 +18,7 @@ from apscheduler.schedulers.background import BackgroundScheduler as bs
 from datetime import datetime
 import holidays
 
-# function to fetch and parse the data from BLS table and converting data to a dataframe.
+# Function to fetch and parse the data from BLS table
 def fetch_bls_table_data():
     url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
     response = requests.get(url)
@@ -104,6 +104,10 @@ scheduler.start()
 if not st.session_state.df.empty:
     df = st.session_state.df
 
+<<<<<<< HEAD
+=======
+    # Dropdown to select data type
+>>>>>>> parent of 9f1dcf7 (Update jobs_dashboard.py)
     data_type = st.selectbox(
         "Select Data Slice:",
         ["Actual Employment", "Percentage Change (Month over Month)", "Percentage Change (Year over Year)"]
