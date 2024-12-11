@@ -13,7 +13,7 @@ import plotly.express as px
 from bs4 import BeautifulSoup
 import streamlit as st
 
-# Function to fetch and parse the data from BLS table
+# function to fetch and parse the data from BLS table and converting data to a dataframe.
 def fetch_bls_table_data():
     url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
     response = requests.get(url)
@@ -68,7 +68,7 @@ df = fetch_bls_table_data()
 if not df.empty:
     df["actual"] = df["value"]
 
-    # Dropdown to select data type
+# this is the slicer. its a mighty fine slicer if i do say so myself.
     data_type = st.selectbox(
         "Select Data Slice:",
         ["Actual Employment", "Percentage Change (Month over Month)", "Percentage Change (Year over Year)"]
@@ -83,7 +83,7 @@ if not df.empty:
         df, title = calculate_percentage_change(df, comparison_type)
         fig = px.line(df, x="date", y="change", title=title,
                       labels={"date": "Date", "change": "% Change"},
-                      template="plotly_dark")
+                      template="plotly_dark")  # if you ask me, all dashboards should be black. it is cleaner, easier on the eyes and, most importantly, it looks frickin' cool.
 
     st.plotly_chart(fig)
 else:
