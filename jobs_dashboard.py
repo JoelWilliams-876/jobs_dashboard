@@ -33,6 +33,7 @@ import holidays
 import dash
 from dash import dcc, html, Input, Output
 
+<<<<<<< HEAD
 # Map month codes (M01, M02, etc.) to actual month names
 month_mapping = {
     "M01": "January", "M02": "February", "M03": "March", "M04": "April", "M05": "May", "M06": "June",
@@ -44,6 +45,9 @@ import streamlit as st
 >>>>>>> parent of cf513d1 (Update jobs_dashboard.py)
 
 # Function to fetch and parse the data from BLS table and convert it to a dataframe.
+=======
+# Function to fetch and parse the data from BLS table
+>>>>>>> parent of 9f1dcf7 (Update jobs_dashboard.py)
 def fetch_bls_table_data():
     url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
     response = requests.get(url)
@@ -150,6 +154,7 @@ if not df.empty:
     df["actual"] = df["value"]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     app.layout = html.Div([
         html.H1("BLS Employment Data"),
 
@@ -202,6 +207,8 @@ if not df.empty:
 =======
 >>>>>>> parent of 3a13521 (Update jobs_dashboard.py)
 =======
+=======
+>>>>>>> parent of 9f1dcf7 (Update jobs_dashboard.py)
     # Dropdown to select data type
     data_type = st.selectbox(
         "Select Data Slice:",
