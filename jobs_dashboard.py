@@ -85,3 +85,5 @@ if not st.session_state.df.empty:
     st.plotly_chart(fig)
 else:
     st.error("No data available for the graph.")
+
+#https://jobsdashboard-frwck3weu5t672hvqcemvc.streamlit.app/
