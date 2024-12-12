@@ -8,6 +8,8 @@ Original file is located at
 """
 
 # with scheduler
+!pip install streamlit
+!pip install plotly
 import requests
 import pandas as pd
 import plotly.express as px
@@ -88,7 +90,7 @@ def fetch_and_update_data():
         print("Not the first business day. No update performed.")
 
 # Main Streamlit app
-st.title("BLS Employment Data")
+#st.title("BLS Employment Data")
 
 # Initialize session state if not already initialized
 if 'df' not in st.session_state:
@@ -117,11 +119,12 @@ if not st.session_state.df.empty:
     else:
         comparison_type = "MoM" if "Month" in data_type else "YoY"
         df, title = calculate_percentage_change(df, comparison_type)
-        fig = px.line(df, x="date", y="change", title=title,
+        fig = px.line(df, x="date", y="change", title="BLS Employment Data",
                       labels={"date": "Date", "change": "% Change"},
                       template="plotly_dark")
     st.plotly_chart(fig)
+    fig.show()
 else:
-    st.error("No data available for the graph.")
+    st.error("Data not found for graph. This is not your day. :'(")
 
 #https://jobsdashboard-frwck3weu5t672hvqcemvc.streamlit.app/
