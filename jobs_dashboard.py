@@ -52,12 +52,17 @@ def fetch_bls_table_data():
 
 # Initialize session state
 if 'df' not in st.session_state or st.session_state.df.empty:
+    st.session_state.df = pd.DataFrame()
+
+# Add a refresh button
+if st.button("Refresh Data"):
     df = fetch_bls_table_data()
     if not df.empty:
-        df["actual"] = df["value"]  # Add the "actual" column
-        st.session_state.df = df  # Store the DataFrame in session state
+        df["actual"] = df["value"]
+        st.session_state.df = df  # Store the updated DataFrame
+        st.success("Data refreshed successfully!")
     else:
-        st.session_state.df = pd.DataFrame()  # Empty DataFrame if fetch fails
+        st.error("Failed to fetch data. Please try again.")
 
 # Main Streamlit App
 st.title("BLS Employment Data")
@@ -85,5 +90,6 @@ if not st.session_state.df.empty:
     st.plotly_chart(fig)
 else:
     st.error("No data available for the graph.")
+
 
 #https://jobsdashboard-frwck3weu5t672hvqcemvc.streamlit.app/
