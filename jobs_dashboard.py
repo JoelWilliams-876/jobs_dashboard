@@ -8,7 +8,6 @@ Original file is located at
 """
 
 # with scheduler
-!pip install apscheduler
 import requests
 import pandas as pd
 import plotly.express as px
