@@ -8,16 +8,13 @@ Original file is located at
 """
 
 # without scheduler
-!pip install streamlit
-import requests
 import pandas as pd
 import plotly.express as px
-from bs4 import BeautifulSoup
 import streamlit as st
-from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
 
-
-# Function to fetch and parse the data from BLS table and convert it to a dataframe.
+# Function to fetch data
 def fetch_bls_table_data():
     url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
     response = requests.get(url)
@@ -53,35 +50,19 @@ def fetch_bls_table_data():
         print("Table not found.")
         return pd.DataFrame()
 
-# Calculate percentage change for MoM and YoY
-def calculate_percentage_change(df, comparison_type):
-    if comparison_type == "MoM":
-        df["change"] = df["value"].pct_change() * 100
-        title = "Month Over Month % Change"
-    elif comparison_type == "YoY":
-        df["change"] = df["value"].pct_change(periods=12) * 100
-        title = "Year Over Year % Change"
-
-    return df, title
-
-# Main Streamlit app
-st.title("BLS Employment Data")
-
-# Initialize session state if not already initialized
-if 'df' not in st.session_state:
-    st.session_state.df = pd.DataFrame()
-
-# Add a button to refresh data manually
-if st.button("Refresh Data"):
+# Initialize session state
+if 'df' not in st.session_state or st.session_state.df.empty:
     df = fetch_bls_table_data()
     if not df.empty:
-        df["actual"] = df["value"]
-        st.session_state.df = df  # Store in session state
-        st.success(f"Data refreshed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        df["actual"] = df["value"]  # Add the "actual" column
+        st.session_state.df = df  # Store the DataFrame in session state
     else:
-        st.error("Failed to fetch data.")
+        st.session_state.df = pd.DataFrame()  # Empty DataFrame if fetch fails
 
-# Check if the data is loaded
+# Main Streamlit App
+st.title("BLS Employment Data")
+
+# Check if data exists
 if not st.session_state.df.empty:
     df = st.session_state.df
 
@@ -96,11 +77,11 @@ if not st.session_state.df.empty:
                       template="plotly_dark")
     else:
         comparison_type = "MoM" if "Month" in data_type else "YoY"
-        df, title = calculate_percentage_change(df, comparison_type)
+        df["change"] = df["value"].pct_change() * 100 if comparison_type == "MoM" else df["value"].pct_change(periods=12) * 100
+        title = "Month Over Month % Change" if comparison_type == "MoM" else "Year Over Year % Change"
         fig = px.line(df, x="date", y="change", title=title,
                       labels={"date": "Date", "change": "% Change"},
                       template="plotly_dark")
-
     st.plotly_chart(fig)
 else:
     st.error("No data available for the graph.")
