@@ -15,6 +15,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # Function to fetch data
+@st.cache_data
 def fetch_bls_table_data():
     url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
     response = requests.get(url)
