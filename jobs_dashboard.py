@@ -46,6 +46,7 @@ def fetch_bls_table_data():
 
         df = pd.DataFrame(data)
         df["date"] = pd.to_datetime(df["date"], format="%m-%Y")
+        df["actual"] = df["value"]  # Create 'actual' column here
         return df
     else:
         print("Table not found.")
@@ -79,15 +80,14 @@ def fetch_and_update_data():
     if is_first_business_day():
         df = fetch_bls_table_data()
         if not df.empty:
-            df["actual"] = df["value"]
-        st.session_state.df = df  # Store in session state
+            st.session_state.df = df  # Store in session state
         print("Data updated successfully.")
     else:
         print("Not the first business day. No update performed.")
 
 # Main Streamlit app
 if 'df' not in st.session_state:
-    st.session_state.df = fetch_bls_table_data()  # Load data on app start
+    st.session_state.df = fetch_bls_table_data()  # Always fetch data at app start
 
 # Start APScheduler in the background to fetch data on the first business day of each month
 if 'scheduler' not in st.session_state:
@@ -96,11 +96,8 @@ if 'scheduler' not in st.session_state:
     scheduler.start()
     st.session_state.scheduler = scheduler  # Store the scheduler in session state
 
-# Display the DataFrame if available
+# Check if the data is loaded and display the graph
 if not st.session_state.df.empty:
-    st.write("Data loaded successfully:")
-    st.write(st.session_state.df.head())  # Display first few rows for debugging
-
     data_type = st.selectbox(
         "Select Data Slice:",
         ["Actual Employment", "Percentage Change (Month over Month)", "Percentage Change (Year over Year)"]
@@ -118,5 +115,4 @@ if not st.session_state.df.empty:
                       template="plotly_dark")
     st.plotly_chart(fig)
 else:
-    st.write("No data available yet. Displaying an empty DataFrame for debugging:")
-    st.write(st.session_state.df)
+    st.error("No data available. Please check the data source.")
