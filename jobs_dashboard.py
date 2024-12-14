@@ -8,8 +8,7 @@ Original file is located at
 """
 
 # with scheduler
-!pip install streamlit
-!pip install plotly
+
 import requests
 import pandas as pd
 import plotly.express as px
