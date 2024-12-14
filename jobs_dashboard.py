@@ -7,9 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1LdV9L1m1oIvEWPT5rWEnlmQZRvAj_Ugr
 """
 
-# with scheduler
-#!pip install streamlit
-#!pip install apscheduler
 import requests
 import pandas as pd
 import plotly.express as px
@@ -35,17 +32,16 @@ def fetch_bls_table_data():
             if len(cols) > 0:
                 year = cols[0].text.strip()
                 period = cols[1].text.strip()
-                value = float(cols[3].text.strip().replace(",", "").split("\r")[0])
-
                 try:
+                    value = float(cols[3].text.strip().replace(",", "").split("\r")[0])
                     month_code = period[1:]
                     concatenated_date = f"{month_code}-{year}"
                     data.append({
                         "date": concatenated_date,
-                        "value": float(value)
+                        "value": value
                     })
                 except ValueError:
-                    print(f"Skipping row with invalid date format: {period} {year}")
+                    print(f"Skipping row with invalid data: {period} {year}")
                     continue
 
         df = pd.DataFrame(data)
@@ -69,11 +65,11 @@ def calculate_percentage_change(df, comparison_type):
 # Function to check if today is the first business day of the month
 def is_first_business_day():
     today = datetime.now().date()
-    us_holidays = holidays.US()  # You can customize this for other countries
+    us_holidays = holidays.US()
     first_day = today.replace(day=1)
 
     # If the first day is a weekend or holiday, find the next business day
-    while first_day.weekday() > 4 or first_day in us_holidays:  # 0-4 are weekdays
+    while first_day.weekday() > 4 or first_day in us_holidays:
         first_day += pd.Timedelta(days=1)
 
     return today == first_day
@@ -90,11 +86,8 @@ def fetch_and_update_data():
         print("Not the first business day. No update performed.")
 
 # Main Streamlit app
-#st.title("BLS Employment Data")
-
-# Initialize session state if not already initialized
 if 'df' not in st.session_state:
-    st.session_state.df = pd.DataFrame()
+    st.session_state.df = fetch_bls_table_data()  # Load data on app start
 
 # Start APScheduler in the background to fetch data on the first business day of each month
 if 'scheduler' not in st.session_state:
@@ -103,9 +96,10 @@ if 'scheduler' not in st.session_state:
     scheduler.start()
     st.session_state.scheduler = scheduler  # Store the scheduler in session state
 
-# Check if the data is loaded
+# Display the DataFrame if available
 if not st.session_state.df.empty:
-    df = st.session_state.df
+    st.write("Data loaded successfully:")
+    st.write(st.session_state.df.head())  # Display first few rows for debugging
 
     data_type = st.selectbox(
         "Select Data Slice:",
@@ -113,23 +107,16 @@ if not st.session_state.df.empty:
     )
 
     if data_type == "Actual Employment":
-        fig = px.line(df, x="date", y="actual", title="Civilian Labor Force",
+        fig = px.line(st.session_state.df, x="date", y="actual", title="Civilian Labor Force",
                       labels={"date": "Date", "actual": "Actual Employment"},
                       template="plotly_dark")
     else:
         comparison_type = "MoM" if "Month" in data_type else "YoY"
-        df, title = calculate_percentage_change(df, comparison_type)
-        fig = px.line(df, x="date", y="change", title="BLS Employment Data",
+        df, title = calculate_percentage_change(st.session_state.df, comparison_type)
+        fig = px.line(df, x="date", y="change", title=title,
                       labels={"date": "Date", "change": "% Change"},
                       template="plotly_dark")
     st.plotly_chart(fig)
-    fig.show()
-    if "date" in df.columns and not df.empty:
-        print(df.head)
-    else:
-        st.error("Required columns are missing from the data.")
 else:
-    st.error("Data not found for graph. This is not your day. :'(")
-
-
-#https://jobsdashboard-frwck3weu5t672hvqcemvc.streamlit.app/
+    st.write("No data available yet. Displaying an empty DataFrame for debugging:")
+    st.write(st.session_state.df)
