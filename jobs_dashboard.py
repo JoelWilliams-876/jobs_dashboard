@@ -8,7 +8,8 @@ Original file is located at
 """
 
 # with scheduler
-
+#!pip install streamlit
+#!pip install apscheduler
 import requests
 import pandas as pd
 import plotly.express as px
@@ -123,7 +124,12 @@ if not st.session_state.df.empty:
                       template="plotly_dark")
     st.plotly_chart(fig)
     fig.show()
+    if "date" in df.columns and not df.empty:
+        print(df.head)
+    else:
+        st.error("Required columns are missing from the data.")
 else:
     st.error("Data not found for graph. This is not your day. :'(")
+
 
 #https://jobsdashboard-frwck3weu5t672hvqcemvc.streamlit.app/
