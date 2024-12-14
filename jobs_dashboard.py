@@ -86,6 +86,8 @@ def fetch_and_update_data():
         print("Not the first business day. No update performed.")
 
 # Main Streamlit app
+st.title("BLS Jobs Data")
+
 if 'df' not in st.session_state:
     st.session_state.df = fetch_bls_table_data()  # Always fetch data at app start
 
