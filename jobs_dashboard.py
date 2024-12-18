@@ -124,4 +124,25 @@ if not st.session_state.df.empty:
             x="date",
             y="actual",
             title="Civilian Labor Force",
-            label
+            labels={"date": "Date", "actual": "Actual Employment"},
+            template="plotly_dark"
+        )
+    else:
+        comparison_type = "MoM" if "Month" in data_type else "YoY"
+        st.session_state.df["change"] = (
+            st.session_state.df["value"].pct_change() * 100
+            if comparison_type == "MoM" else
+            st.session_state.df["value"].pct_change(periods=12) * 100
+        )
+        title = "Month Over Month % Change" if comparison_type == "MoM" else "Year Over Year % Change"
+        fig_employment = px.line(
+            st.session_state.df,
+            x="date",
+            y="change",
+            title=title,
+            labels={"date": "Date", "change": "% Change"},
+            template="plotly_dark"
+        )
+    st.plotly_chart(fig_employment)
+else:
+    st.error("No employment data available. Please check the data source.")
