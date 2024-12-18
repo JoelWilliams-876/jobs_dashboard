@@ -50,19 +50,50 @@ def fetch_unemployment_data():
         print("Unemployment data table not found.")
         return pd.DataFrame()
 
+# Function to fetch employment data
+def fetch_bls_table_data():
+    url = "https://data.bls.gov/dataViewer/view/timeseries/LNS11000000"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    table = soup.find("table", {"id": "seriesDataTable1"})
+
+    if table:
+        rows = table.find_all("tr")
+        data = []
+
+        for row in rows:
+            cols = row.find_all("td")
+            if len(cols) > 0:
+                year = cols[0].text.strip()
+                period = cols[1].text.strip()
+                try:
+                    value = float(cols[3].text.strip().replace(",", "").split("\r")[0])
+                    month_code = period[1:]
+                    concatenated_date = f"{month_code}-{year}"
+                    data.append({
+                        "date": concatenated_date,
+                        "value": value
+                    })
+                except ValueError:
+                    continue
+
+        df = pd.DataFrame(data)
+        df["date"] = pd.to_datetime(df["date"], format="%m-%Y")
+        df["actual"] = df["value"]
+        return df
+    else:
+        print("Table not found.")
+        return pd.DataFrame()
+
+# Initialize session state variables
+if 'df' not in st.session_state:
+    st.session_state.df = fetch_bls_table_data()
+
+if 'unemployment_df' not in st.session_state:
+    st.session_state.unemployment_df = fetch_unemployment_data()
+
 # Main Streamlit app
 st.title("BLS Jobs and Unemployment Data")
-
-if 'df' not in st.session_state:
-    st.session_state.df = fetch_bls_table_data()  # Employment data
-    st.session_state.unemployment_df = fetch_unemployment_data()  # U-3 and U-6 data
-
-# Start APScheduler in the background
-if 'scheduler' not in st.session_state:
-    scheduler = bs()
-    scheduler.add_job(fetch_and_update_data, 'cron', day='1-7', hour=9, minute=0)
-    scheduler.start()
-    st.session_state.scheduler = scheduler
 
 # Display the unemployment graph overlay
 if not st.session_state.unemployment_df.empty:
@@ -93,20 +124,4 @@ if not st.session_state.df.empty:
             x="date",
             y="actual",
             title="Civilian Labor Force",
-            labels={"date": "Date", "actual": "Actual Employment"},
-            template="plotly_dark"
-        )
-    else:
-        comparison_type = "MoM" if "Month" in data_type else "YoY"
-        df, title = calculate_percentage_change(st.session_state.df, comparison_type)
-        fig_employment = px.line(
-            df,
-            x="date",
-            y="change",
-            title=title,
-            labels={"date": "Date", "change": "% Change"},
-            template="plotly_dark"
-        )
-    st.plotly_chart(fig_employment)
-else:
-    st.error("No employment data available. Please check the data source.")
+            label
