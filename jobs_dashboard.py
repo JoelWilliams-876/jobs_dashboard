@@ -12,7 +12,6 @@ import pandas as pd
 import plotly.express as px
 from bs4 import BeautifulSoup
 import streamlit as st
-from datetime import datetime
 
 # Function to fetch U-3 and U-6 data from the cps_empsit_a12 table
 def fetch_unemployment_data():
@@ -25,8 +24,6 @@ def fetch_unemployment_data():
         st.error("Table cps_empsit_a12 not found.")
         return pd.DataFrame()
 
-    rows = table.find_all("tr")
-
     # Extract rows for U-3 and U-6
     u3_row = table.find("tr", {"id": "cps_empsit_a12-4-0"})
     u6_row = table.find("tr", {"id": "cps_empsit_a12-7-0"})
@@ -35,7 +32,7 @@ def fetch_unemployment_data():
         st.error("Specified rows for U-3 or U-6 not found in the table.")
         return pd.DataFrame()
 
-    # Extract columns 5 through 9 (monthly data for the last 5 months)
+    # Extract columns 5 through 9 (July 2024 to Nov. 2024)
     def extract_row_data(row):
         cols = row.find_all("td")[4:9]  # Columns 5 through 9
         return [float(col.text.strip()) for col in cols]
@@ -43,11 +40,10 @@ def fetch_unemployment_data():
     u3_data = extract_row_data(u3_row)
     u6_data = extract_row_data(u6_row)
 
-    # Create a DataFrame with dates for the last 5 months
-    today = datetime.now()
-    dates = [(today.replace(day=1) - pd.DateOffset(months=i)).strftime("%b %Y") for i in range(len(u3_data))]
-    dates.reverse()  # Ensure oldest dates are first
+    # Define the corresponding dates
+    dates = ["July 2024", "Aug. 2024", "Sept. 2024", "Oct. 2024", "Nov. 2024"]
 
+    # Create a DataFrame with dates and unemployment rates
     df = pd.DataFrame({
         "Date": dates,
         "U-3": u3_data,
@@ -66,9 +62,9 @@ if 'unemployment_df' not in st.session_state:
 if not st.session_state.unemployment_df.empty:
     unemployment_df = st.session_state.unemployment_df
 
-    # Display the DataFrame separately
-    st.subheader("Unemployment Data Table (Last 5 Months)")
-    st.dataframe(unemployment_df)  # Display the full DataFrame
+    # Display the full DataFrame
+    st.subheader("Unemployment Data Table (July 2024 to Nov. 2024)")
+    st.dataframe(unemployment_df)
 
     # Select unemployment rate (U-3 or U-6)
     unemployment_type = st.radio("Select Unemployment Rate:", ["U-3", "U-6"])
@@ -78,14 +74,14 @@ if not st.session_state.unemployment_df.empty:
 
     # Display the filtered DataFrame for the selected rate
     st.subheader(f"Selected Data for {unemployment_type}")
-    st.dataframe(selected_data)  # Display only the relevant columns
+    st.dataframe(selected_data)
 
     # Plot the unemployment data
     fig_unemployment = px.line(
         selected_data,
         x="Date",
         y="Rate",
-        title=f"{unemployment_type} Unemployment Rate (Last 5 Months)",
+        title=f"{unemployment_type} Unemployment Rate (July 2024 to Nov. 2024)",
         labels={"Date": "Date", "Rate": f"{unemployment_type} Unemployment Rate (%)"},
         template="plotly_dark"
     )
